@@ -1,0 +1,24 @@
+<?php
+
+namespace Lauchoit\LaravelHexMod\Shared\Responses;
+
+use Illuminate\Contracts\Validation\Validator;
+
+trait ValidationResponse
+{
+    /**
+     * Handle a failed validation attempt.
+     */
+    protected function failedValidation(Validator $validator): void
+    {
+        $exception = $validator->getException();
+
+        throw (new $exception($validator,
+            response()->json([
+                'ok' => false,
+                'message' => ApiResponse::$ERROR_VALIDATION_FAILED,
+                'data' => $validator->errors(),
+            ], 422)
+        ));
+    }
+}

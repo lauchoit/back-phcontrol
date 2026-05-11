@@ -67,7 +67,7 @@ return [
         'testing' => [
             'driver' => 'mysql',
             'url' => env('DB_URL'),
-            'host' => 'host.docker.internal', // '127.0.0.1',
+            'host' => '127.0.0.1',
             'port' => env('DB_PORT', '3306'),
             'database' => env('DB_DATABASE_TEST', 'laravel'),
             'username' => env('DB_USERNAME', 'root'),
@@ -80,7 +80,7 @@ return [
             'strict' => true,
             'engine' => null,
             'options' => extension_loaded('pdo_mysql') ? array_filter([
-                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+                (PHP_VERSION_ID >= 80500 ? Mysql::ATTR_SSL_CA : PDO::MYSQL_ATTR_SSL_CA) => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
         ],
 

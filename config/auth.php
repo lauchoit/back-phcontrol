@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\User;
+use Lauchoit\LaravelHexMod\User\Infrastructure\Model\User;
 
 return [
 

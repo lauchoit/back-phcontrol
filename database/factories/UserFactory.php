@@ -2,16 +2,21 @@
 
 namespace Database\Factories;
 
-use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
+use Lauchoit\LaravelHexMod\User\Infrastructure\Model\User;
 
 /**
  * @extends Factory<User>
  */
 class UserFactory extends Factory
 {
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var class-string<User>
+     */
+    protected $model = User::class;
+
     /**
      * The current password being used by the factory.
      */
@@ -25,11 +30,13 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->name(),
-            'email' => fake()->unique()->safeEmail(),
-            'email_verified_at' => now(),
-            'password' => static::$password ??= Hash::make('password'),
-            'remember_token' => Str::random(10),
+            'name' => $this->faker->word,
+            'lastname' => $this->faker->word,
+            'email' => $this->faker->unique()->email(),
+            'password' => bcrypt('password'), // password
+            'phone' => $this->faker->e164PhoneNumber(),
+            'is_active' => true,
+            'language' => 'en',
         ];
     }
 

@@ -45,4 +45,6 @@ return [
 
     'connection' => env('PASSPORT_CONNECTION'),
 
+    'token_name' => env('PASSPORT_TOKEN_NAME'),
+
 ];
