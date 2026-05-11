@@ -18,7 +18,8 @@ class Permission extends Seeder
             'permissions',
             'country',
             'email-template',
-            'product'
+            'product',
+            'supplier',
         ];
 
         $permissionsTypes = [

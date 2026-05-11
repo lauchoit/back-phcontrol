@@ -14,7 +14,7 @@ readonly class FindByIdProductUseCase
     /**
      * Find by ID Product entities.
      */
-    public function execute($productId): ?Product
+    public function execute(string $productId): ?Product
     {
         return $this->productRepository->findById($productId);
     }

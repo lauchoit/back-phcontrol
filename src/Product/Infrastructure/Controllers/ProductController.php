@@ -47,7 +47,7 @@ class ProductController extends Controller
     /**
      * Find a Product entity by its ID.
      */
-    public function findById(int $productId): JsonResponse
+    public function findById(string $productId): JsonResponse
     {
         $this->authorize('findById', [ProductModel::class, $productId]);
 
@@ -62,7 +62,7 @@ class ProductController extends Controller
     /**
      * Delete a Product entity by its ID.
      */
-    public function deleteById(int $productId): JsonResponse
+    public function deleteById(string $productId): JsonResponse
     {
         $this->authorize('deleteById', [ProductModel::class, $productId]);
 
@@ -78,7 +78,7 @@ class ProductController extends Controller
     /**
      * Update a Product entity by its ID.
      */
-    public function updateById(int $productId, UpdateProductRequest $data): JsonResponse
+    public function updateById(string $productId, UpdateProductRequest $data): JsonResponse
     {
         $this->authorize('updateById', [ProductModel::class, $productId]);
 

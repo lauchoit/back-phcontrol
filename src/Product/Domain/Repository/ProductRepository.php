@@ -21,7 +21,7 @@ abstract class ProductRepository
     /**
      * Finds a Product by its ID.
      */
-    abstract public function findById(int $productId): ?Product;
+    abstract public function findById(string $productId): ?Product;
 
     /**
      * Deletes a Product by its ID.
@@ -31,5 +31,5 @@ abstract class ProductRepository
     /**
      * Update a Product entity by its ID.
      */
-    abstract public function updateById(int $productId, array $data): Product;
+    abstract public function updateById(string $productId, array $data): Product;
 }

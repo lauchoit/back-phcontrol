@@ -3,6 +3,7 @@
 namespace Lauchoit\LaravelHexMod\Product\Tests\Feature;
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Str;
 use Lauchoit\LaravelHexMod\Product\Domain\Entity\Product;
 use Lauchoit\LaravelHexMod\Product\Infrastructure\Resources\ProductResource;
 use PHPUnit\Framework\Attributes\Test;
@@ -95,6 +96,7 @@ class CreateProductTest extends TestCase
 
         $this->assertInstanceOf(ProductResource::class, $response->getOriginalContent()['data']);
         $this->assertInstanceOf(Product::class, $response->getOriginalContent()['data']->resource);
+        $this->assertTrue(Str::isUuid($response->json('data.id')));
     }
 
     #[TestDox('Create product check response structure')]

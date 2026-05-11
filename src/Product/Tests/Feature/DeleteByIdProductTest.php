@@ -60,7 +60,7 @@ class DeleteByIdProductTest extends TestCase
         ])->deleteJson("/api/product/{$product->id}")
             ->assertStatus(200);
 
-        $this->assertDatabaseMissing('products', ['id' => $product->id]);
+        $this->assertSoftDeleted('products', ['id' => $product->id]);
     }
 
     #[TestDox('Delete a Product by ID')]
@@ -76,7 +76,7 @@ class DeleteByIdProductTest extends TestCase
         ])->deleteJson($url)
             ->assertStatus(200);
 
-        $this->assertDatabaseMissing('products', ['id' => $product->id]);
+        $this->assertSoftDeleted('products', ['id' => $product->id]);
     }
 
     #[TestDox('Delete a Product with bad ID')]

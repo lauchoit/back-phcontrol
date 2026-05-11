@@ -12,7 +12,7 @@ readonly class DeleteByIdProductUseCase
         private FindByIdProductUseCase $findByIdProductUseCase,
     ) {}
 
-    public function execute(int $productId): bool
+    public function execute(string $productId): bool
     {
         $product = $this->findByIdProductUseCase->execute($productId);
         if (! $product) {

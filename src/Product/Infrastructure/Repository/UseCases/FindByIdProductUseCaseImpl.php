@@ -8,7 +8,7 @@ use Lauchoit\LaravelHexMod\Product\Infrastructure\Model\Product as ProductModel;
 
 class FindByIdProductUseCaseImpl
 {
-    public function execute($productId): ?Product
+    public function execute(string $productId): ?Product
     {
         $productModel = ProductModel::find($productId);
         if (! $productModel) {

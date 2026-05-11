@@ -12,7 +12,7 @@ class UpdateByIdProductUseCaseImpl
     /**
      * Update a Product by its ID.
      */
-    public function execute(int $productId, array $data): Product
+    public function execute(string $productId, array $data): Product
     {
         $productModel = ProductModel::find($productId);
         if (! $productModel) {

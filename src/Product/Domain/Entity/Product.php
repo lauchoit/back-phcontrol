@@ -4,7 +4,7 @@ namespace Lauchoit\LaravelHexMod\Product\Domain\Entity;
 
 class Product
 {
-    private int $id;
+    private string $id;
 
     private string $name;
 
@@ -16,7 +16,7 @@ class Product
 
     private string $updatedAt;
 
-    public function __construct(int $id, string $name, bool $isActive, int $order, string $createdAt, string $updatedAt)
+    public function __construct(string $id, string $name, bool $isActive, int $order, string $createdAt, string $updatedAt)
     {
         $this->id = $id;
         $this->name = $name;
@@ -26,7 +26,7 @@ class Product
         $this->updatedAt = $updatedAt;
     }
 
-    public function getId(): int
+    public function getId(): string
     {
         return $this->id;
     }

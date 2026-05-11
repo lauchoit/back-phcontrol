@@ -14,7 +14,7 @@ readonly class UpdateByIdProductUseCase
     /**
      * Update a Product entity by its ID.
      */
-    public function execute(int $productId, array $data): Product
+    public function execute(string $productId, array $data): Product
     {
         return $this->productRepository->updateById($productId, $data);
     }

@@ -4,13 +4,15 @@ namespace Lauchoit\LaravelHexMod\Product\Infrastructure\Model;
 
 use Database\Factories\ProductFactory;
 use Illuminate\Database\Eloquent\Attributes\UsePolicy;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Lauchoit\LaravelHexMod\Product\Domain\Entity\ProductSource;
 use Lauchoit\LaravelHexMod\Product\Infrastructure\Policies\ProductPolicy;
 
 /**
- * @property int $id
+ * @property string $id
  * @property string $name
  * @property bool $is_active
  * @property int $order
@@ -21,7 +23,7 @@ use Lauchoit\LaravelHexMod\Product\Infrastructure\Policies\ProductPolicy;
 class Product extends Model
 {
     /** @use HasFactory<ProductFactory> */
-    use HasFactory;
+    use HasFactory, HasUuids, SoftDeletes;
 
     /**
      * Create a new factory instance for the Product model.
@@ -43,14 +45,14 @@ class Product extends Model
      *
      * @var string
      */
-    protected $keyType = 'int';
+    protected $keyType = 'string';
 
     /**
      * Indicates if the IDs are auto-incrementing.
      *
      * @var bool
      */
-    public $incrementing = true;
+    public $incrementing = false;
 
     /**
      * The attributes that are mass assignable.

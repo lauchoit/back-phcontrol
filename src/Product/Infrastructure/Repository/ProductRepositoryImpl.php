@@ -41,7 +41,7 @@ class ProductRepositoryImpl extends ProductRepository
     /**
      * Finds a Product by its ID.
      */
-    public function findById(int $productId): ?Product
+    public function findById(string $productId): ?Product
     {
         return $this->findById->execute($productId);
     }
@@ -57,7 +57,7 @@ class ProductRepositoryImpl extends ProductRepository
     /**
      * Update a Product entity by its ID.
      */
-    public function updateById(int $productId, array $data): Product
+    public function updateById(string $productId, array $data): Product
     {
         return $this->updateById->execute($productId, $data);
     }

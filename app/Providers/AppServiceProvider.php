@@ -14,6 +14,8 @@ use Lauchoit\LaravelHexMod\Product\Domain\Repository\ProductRepository;
 use Lauchoit\LaravelHexMod\Product\Infrastructure\Repository\ProductRepositoryImpl;
 use Lauchoit\LaravelHexMod\SendNotification\Domain\Repository\SendNotificationRepository;
 use Lauchoit\LaravelHexMod\SendNotification\Infrastructure\Repository\SendNotificationRepositoryImpl;
+use Lauchoit\LaravelHexMod\Supplier\Domain\Repository\SupplierRepository;
+use Lauchoit\LaravelHexMod\Supplier\Infrastructure\Repository\SupplierRepositoryImpl;
 use Lauchoit\LaravelHexMod\TemplateNotification\Domain\Repository\TemplateNotificationRepository;
 use Lauchoit\LaravelHexMod\TemplateNotification\Infrastructure\Repository\TemplateNotificationRepositoryImpl;
 use Lauchoit\LaravelHexMod\User\Domain\Repository\UserRepository;
@@ -34,6 +36,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        $this->app->bind(SupplierRepository::class, SupplierRepositoryImpl::class);
         $this->app->bind(ProductRepository::class, ProductRepositoryImpl::class);
         $this->app->bind(AuthRepository::class, AuthRepositoryImpl::class);
         $this->app->bind(RoleRepository::class, RoleRepositoryImpl::class);

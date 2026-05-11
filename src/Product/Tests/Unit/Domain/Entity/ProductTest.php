@@ -14,7 +14,7 @@ class ProductTest extends TestCase
     public function test_product_entity_getters_and_setters(): void
     {
         $product = new Product(
-            1,
+            '00000000-0000-0000-0000-000000000001',
             'Name',
             true,
             123,
@@ -22,8 +22,7 @@ class ProductTest extends TestCase
             '2024-01-01 00:00:00'
         );
 
-        // Verificar getters iniciales
-        $this->assertEquals(1, $product->getId());
+        $this->assertEquals('00000000-0000-0000-0000-000000000001', $product->getId());
         $this->assertEquals('Name', $product->getName());
         $this->assertEquals(true, $product->getIsActive());
         $this->assertEquals(123, $product->getOrder());

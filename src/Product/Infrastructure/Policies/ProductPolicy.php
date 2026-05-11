@@ -14,7 +14,7 @@ class ProductPolicy
         return $user->can('product.create');
     }
 
-    public function deleteById(User $user, int $productId): bool
+    public function deleteById(User $user, string $productId): bool
     {
         return $user->can('product.delete.by.id');
     }
@@ -24,12 +24,12 @@ class ProductPolicy
         return $user->can('product.find.all');
     }
 
-    public function findById(User $user, int $productId): bool
+    public function findById(User $user, string $productId): bool
     {
         return $user->can('product.find.by.id');
     }
 
-    public function updateById(User $user, int $productId): bool
+    public function updateById(User $user, string $productId): bool
     {
         return $user->can('product.update.by.id');
     }
