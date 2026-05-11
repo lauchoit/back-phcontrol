@@ -10,6 +10,8 @@ use Lauchoit\LaravelHexMod\AccessControl\Infrastructure\Repository\PermissionRep
 use Lauchoit\LaravelHexMod\AccessControl\Infrastructure\Repository\RoleRepositoryImpl;
 use Lauchoit\LaravelHexMod\Auth\Domain\Repository\AuthRepository;
 use Lauchoit\LaravelHexMod\Auth\Infrastructure\Repository\AuthRepositoryImpl;
+use Lauchoit\LaravelHexMod\Product\Domain\Repository\ProductRepository;
+use Lauchoit\LaravelHexMod\Product\Infrastructure\Repository\ProductRepositoryImpl;
 use Lauchoit\LaravelHexMod\SendNotification\Domain\Repository\SendNotificationRepository;
 use Lauchoit\LaravelHexMod\SendNotification\Infrastructure\Repository\SendNotificationRepositoryImpl;
 use Lauchoit\LaravelHexMod\TemplateNotification\Domain\Repository\TemplateNotificationRepository;
@@ -32,6 +34,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        $this->app->bind(ProductRepository::class, ProductRepositoryImpl::class);
         $this->app->bind(AuthRepository::class, AuthRepositoryImpl::class);
         $this->app->bind(RoleRepository::class, RoleRepositoryImpl::class);
         $this->app->bind(PermissionRepository::class, PermissionRepositoryImpl::class);

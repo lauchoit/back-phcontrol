@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Lauchoit\LaravelHexMod\AccessControl\Infrastructure\Model\Permission as PermissionModel;
 use Lauchoit\LaravelHexMod\AccessControl\Infrastructure\Model\Role;
 use Lauchoit\LaravelHexMod\User\Infrastructure\Model\User;
 
@@ -33,25 +34,13 @@ class DatabaseSeeder extends Seeder
         $userSystemAdmin = User::factory()->create([
             'name' => 'system',
             'lastname' => 'admin',
-            'email' => 'system@sir.com',
+            'email' => 'system@ejemplo.com',
             'password' => bcrypt('12345678'),
         ]);
 
         $roleSystemAdmin = Role::findByName('system_admin', 'api');
-        $roleSystemAdmin->syncPermissions([
-            'user.find.all',
-            'user.find.own',
-            'user.create',
-            'user.update.by.id',
-            'user.delete.by.id',
-            'user.sync.roles',
-            'permissions.find.all',
-            'permissions.find.by.id',
-            'permissions.create',
-            'roles.find.all',
-            'roles.find.by.id',
-            'roles.update.by.id',
-        ]);
+        $permissions = PermissionModel::all()->pluck('name');
+        $roleSystemAdmin->syncPermissions($permissions);
 
         $userSystemAdmin->assignRole($roleSystemAdmin);
     }

@@ -23,6 +23,7 @@ return Application::configure(basePath: dirname(__DIR__))
             require base_path('src/User/Infrastructure/Routes/UserRoutes.php'),
             require base_path('src/Auth/Infrastructure/Routes/AuthRoutes.php'),
             require base_path('src/AccessControl/Infrastructure/Routes/AccessControlRoutes.php'),
+            require base_path('src/Product/Infrastructure/Routes/ProductRoutes.php'),
         ],
     )
     ->withMiddleware(function (Middleware $middleware): void {
