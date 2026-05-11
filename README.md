@@ -1,58 +1,282 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# phcontrol
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Backend para el control de inventario de PokeHouse.
 
-## About Laravel
+phcontrol nace para llevar el inventario semanal de productos, registrar las entregas de proveedores, controlar los envios de mercancia entre sedes, medir el consumo de la sede principal de Brickell y generar reportes en PDF con las cantidades inventariadas.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+El sistema esta construido con Laravel siguiendo una arquitectura hexagonal por modulo. La intencion es mantener las reglas de negocio separadas del framework y dejar Laravel concentrado en la capa de infraestructura: controladores, modelos Eloquent, requests, resources, policies, rutas y persistencia.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Objetivo del sistema
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+PokeHouse necesita saber, semana a semana, cuanto producto queda disponible, cuanto entra por proveedores, cuanto se envia a otras sedes y cuanto consume Brickell como sede principal.
 
-## Learning Laravel
+El objetivo de phcontrol es centralizar ese flujo para que el inventario no dependa de hojas sueltas, mensajes o calculos manuales. Cada movimiento debe quedar registrado, trazable y disponible para consulta o reporte.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Flujo principal
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+1. Se crea o selecciona un periodo semanal de inventario.
+2. Se registra la existencia inicial o el conteo actual de cada producto.
+3. Se registran las cantidades entregadas por los proveedores durante la semana.
+4. Se registran las cantidades enviadas desde Brickell hacia otras sedes.
+5. Se registra o calcula el consumo de Brickell.
+6. Se calcula cuanto queda disponible por producto.
+7. Se genera un PDF del inventario semanal con las cantidades de cada producto.
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+## Conceptos del negocio
 
-## Agentic Development
+### Productos
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+Representan los insumos o articulos que PokeHouse necesita controlar. Cada producto debe poder estar activo o inactivo y debe conservar un orden para facilitar la visualizacion en listas, formularios y reportes.
 
-```bash
-composer require laravel/boost --dev
+El modulo `Product` ya existe y actualmente incluye CRUD protegido por autenticacion y autorizacion.
 
-php artisan boost:install
+### Inventarios semanales
+
+Cada semana debe tener un inventario asociado. Ese inventario representa el estado de los productos dentro de un periodo especifico.
+
+El inventario semanal debe permitir responder preguntas como:
+
+- Cuanto quedo de cada producto al cierre de la semana.
+- Cuanto producto entro por proveedores.
+- Cuanto producto salio hacia otras sedes.
+- Cuanto consumio Brickell.
+- Que diferencias existen entre lo esperado y lo contado.
+
+### Proveedores
+
+Los proveedores entregan cantidades de productos semanalmente. El sistema debe registrar esas entregas por producto, proveedor, fecha y cantidad.
+
+Esto permite saber cuanto se compro o recibio realmente durante cada semana y comparar esas entradas contra el consumo y los envios.
+
+### Sedes
+
+Brickell es la sede principal. Desde ahi se controla el inventario central y se registran envios de productos a otras sedes.
+
+Las otras sedes deben poder recibir cantidades de productos, quedando cada envio registrado como movimiento de inventario.
+
+### Consumo de Brickell
+
+El consumo de Brickell representa la cantidad de producto utilizada por la sede principal durante la semana.
+
+Ese consumo puede calcularse a partir de:
+
+- Inventario inicial.
+- Entradas de proveedores.
+- Salidas hacia otras sedes.
+- Inventario final.
+
+Formula conceptual:
+
+```text
+consumo_brickell = inventario_inicial + entradas_proveedores - envios_otras_sedes - inventario_final
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+La implementacion final puede ajustar esta formula si aparecen movimientos adicionales, devoluciones, mermas o correcciones.
 
-## Contributing
+### Reportes PDF
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+El sistema debe generar PDFs de los inventarios creados. Los reportes deben incluir las cantidades de cada producto y servir como respaldo operativo para revision, cierre semanal o envio administrativo.
 
-## Code of Conduct
+Un PDF de inventario deberia incluir, como minimo:
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+- Semana o rango de fechas.
+- Fecha de generacion.
+- Productos inventariados.
+- Cantidad inicial.
+- Cantidad recibida por proveedores.
+- Cantidad enviada a otras sedes.
+- Consumo de Brickell.
+- Cantidad final.
+- Usuario que genero el reporte.
 
-## Security Vulnerabilities
+## Arquitectura
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+El proyecto sigue una estructura modular con arquitectura hexagonal:
 
-## License
+```text
+src/
+  Product/
+    Domain/
+    Application/
+    Infrastructure/
+    Tests/
+  User/
+    Domain/
+    Application/
+    Infrastructure/
+    Tests/
+  Auth/
+    Domain/
+    Application/
+    Infrastructure/
+    Tests/
+  AccessControl/
+    Domain/
+    Application/
+    Infrastructure/
+    Tests/
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Cada modulo mantiene separadas sus responsabilidades:
+
+- `Domain`: entidades, contratos, excepciones y reglas propias del negocio.
+- `Application`: casos de uso que orquestan las operaciones del modulo.
+- `Infrastructure`: adaptadores Laravel, controladores, requests, resources, modelos, policies, rutas y repositorios concretos.
+- `Tests`: pruebas unitarias y feature tests del modulo.
+
+La regla principal es que `Domain` y `Application` no deben depender de Laravel. La dependencia con el framework debe vivir en `Infrastructure`.
+
+## Modulos actuales
+
+### Auth
+
+Gestiona autenticacion y generacion de tokens para consumir la API.
+
+### User
+
+Gestiona usuarios del sistema.
+
+### AccessControl
+
+Gestiona roles, permisos y autorizacion. Usa permisos para proteger acciones del API.
+
+### Product
+
+Gestiona el catalogo de productos del inventario. El CRUD esta protegido por autenticacion y policies.
+
+Permisos principales:
+
+- `product.find.all`
+- `product.find.by.id`
+- `product.create`
+- `product.update.by.id`
+- `product.delete.by.id`
+
+## Modulos planeados
+
+### Inventory
+
+Modulo encargado de crear y cerrar inventarios semanales.
+
+Responsabilidades esperadas:
+
+- Crear inventario semanal.
+- Asociar productos al inventario.
+- Registrar conteos iniciales y finales.
+- Calcular cantidades disponibles.
+- Marcar inventarios como abiertos, cerrados o anulados.
+
+### Supplier
+
+Modulo para administrar proveedores.
+
+Responsabilidades esperadas:
+
+- Crear proveedores.
+- Activar o desactivar proveedores.
+- Asociar entregas de productos a un proveedor.
+
+### SupplierDelivery
+
+Modulo para registrar las cantidades que entregan los proveedores semanalmente.
+
+Responsabilidades esperadas:
+
+- Registrar fecha de entrega.
+- Registrar proveedor.
+- Registrar productos y cantidades entregadas.
+- Asociar la entrega a una semana o inventario.
+
+### Branch
+
+Modulo para administrar sedes.
+
+Responsabilidades esperadas:
+
+- Registrar sedes de PokeHouse.
+- Identificar Brickell como sede principal.
+- Activar o desactivar sedes.
+
+### StockTransfer
+
+Modulo para registrar envios de productos desde Brickell hacia otras sedes.
+
+Responsabilidades esperadas:
+
+- Registrar sede destino.
+- Registrar productos enviados.
+- Registrar cantidades enviadas.
+- Asociar el envio al inventario semanal correspondiente.
+
+### BrickellConsumption
+
+Modulo para registrar o calcular el consumo de Brickell.
+
+Responsabilidades esperadas:
+
+- Calcular consumo por producto.
+- Permitir ajustes controlados si hace falta.
+- Mantener trazabilidad de cambios.
+
+### InventoryReport
+
+Modulo para generar reportes PDF de inventario.
+
+Responsabilidades esperadas:
+
+- Generar PDF por inventario semanal.
+- Mostrar resumen por producto.
+- Incluir entradas, salidas, consumo y cantidad final.
+- Guardar o entregar el archivo generado.
+
+## Seguridad
+
+La API debe estar protegida por autenticacion y autorizacion.
+
+Patron esperado para los endpoints:
+
+1. Usuario no autenticado: respuesta `401`.
+2. Usuario autenticado sin permiso: respuesta `403`.
+3. Usuario autorizado: respuesta exitosa.
+4. Validaciones propias del endpoint.
+
+Los tests de cada CRUD deben seguir ese mismo orden para que la intencion quede clara y consistente.
+
+## Testing
+
+El proyecto usa PHPUnit.
+
+Comandos utiles:
+
+```bash
+php artisan test --compact
+```
+
+Para correr solo un modulo:
+
+```bash
+php artisan test --compact src/Product/Tests
+```
+
+Cada modulo debe tener pruebas unitarias para dominio y pruebas feature para endpoints.
+
+## Formato de codigo
+
+Despues de modificar archivos PHP se debe correr Pint:
+
+```bash
+vendor/bin/pint --dirty --format agent
+```
+
+## Estado actual
+
+El sistema ya cuenta con la base de:
+
+- Autenticacion.
+- Usuarios.
+- Roles y permisos.
+- Catalogo de productos protegido.
+- Estructura hexagonal por modulo.
+- Pruebas automatizadas para los modulos existentes.
+
+El siguiente paso natural es construir el flujo de inventario semanal alrededor de los productos, proveedores, sedes, movimientos y reportes PDF.
