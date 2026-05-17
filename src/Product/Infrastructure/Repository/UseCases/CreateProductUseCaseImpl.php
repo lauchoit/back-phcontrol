@@ -11,8 +11,8 @@ class CreateProductUseCaseImpl
     public function execute(array $newProduct): Product
     {
         $data = ProductMapper::toPersistence($newProduct);
-        $dataSource = ProductModel::create($data);
+        $data->save();
 
-        return ProductMapper::toDomain($dataSource->toArray());
+        return ProductMapper::toDomain($data);
     }
 }

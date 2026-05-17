@@ -15,6 +15,6 @@ class FindByIdProductUseCaseImpl
             return null;
         }
 
-        return ProductMapper::toDomain($productModel->toArray());
+        return ProductMapper::toDomain($productModel);
     }
 }

@@ -41,7 +41,9 @@ class ProductController extends Controller
 
         $products = $this->findAllProductUseCase->execute();
 
-        return ApiResponse::success(message: ApiResponse::$SUCCESS_SEARCH, data: ProductResource::collection($products));
+        $products['items'] = ProductResource::collection($products['data']);
+        unset($products['data']);
+        return ApiResponse::success(message: ApiResponse::$SUCCESS_SEARCH, data: $products);
     }
 
     /**

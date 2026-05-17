@@ -1,8 +1,8 @@
 services:
     back.phcontrol:
         build:
-            context: './docker/8.5'
-            dockerfile: Dockerfile
+            context: '.'
+            dockerfile: docker/8.5/Dockerfile
             args:
                 WWWGROUP: '${WWWGROUP}'
         image: 'phcontrol/app'

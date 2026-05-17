@@ -61,7 +61,7 @@ class FindAllProductTest extends TestCase
 
     #[TestDox('Find all Product, verify structure and type')]
     #[Test]
-    public function find_all_product(): void
+    public function find_all_product_verify_structure_wirh_pagination(): void
     {
         ProductModel::factory()->count(5)->create();
 
@@ -75,21 +75,35 @@ class FindAllProductTest extends TestCase
             'ok',
             'message',
             'data' => [
-                '*' => [
-                    'id',
-                    'name',
-                    'isActive',
-                    'order',
-                    'createdAt',
-                    'updatedAt',
-                ],
+                'current_page',
+                'first_page_url',
+                'from',
+                'last_page',
+                'last_page_url',
+                'links',
+                'next_page_url',
+                'path',
+                'per_page',
+                'prev_page_url',
+                'to',
+                'total',
+                'items' => [
+                    '*' => [
+                        'id',
+                        'name',
+                        'isActive',
+                        'order',
+                        'createdAt',
+                        'updatedAt',
+                    ],
+                ]
             ],
         ]);
 
         $original_data = $response->getOriginalContent();
-        $this->assertInstanceOf(ProductResource::class, $original_data['data'][0]);
-        $this->assertInstanceOf(Product::class, $original_data['data'][0]->resource);
-        $this->assertCount(5, $original_data['data']);
+        $this->assertInstanceOf(ProductResource::class, $original_data['data']['items'][0]);
+        $this->assertInstanceOf(Product::class, $original_data['data']['items'][0]->resource);
+        $this->assertCount(5, $original_data['data']['items']);
         $response->assertStatus(200);
     }
 }

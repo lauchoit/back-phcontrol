@@ -3,21 +3,22 @@
 namespace Lauchoit\LaravelHexMod\Product\Domain\Mappers;
 
 use Lauchoit\LaravelHexMod\Product\Domain\Entity\Product;
+use Lauchoit\LaravelHexMod\Product\Infrastructure\Model\Product as ProductModel;
 
 class ProductMapper
 {
     /**
      * Maps the fields from the ProductModel to the Product entity.
      */
-    public static function toDomain(array $product): Product
+    public static function toDomain(ProductModel $product): Product
     {
         return new Product(
-            id: $product['id'],
-            name: $product['name'],
-            isActive: $product['is_active'],
-            order: $product['order'],
-            createdAt: $product['created_at'],
-            updatedAt: $product['updated_at'],
+            id: $product->id,
+            name: $product->name,
+            isActive: $product->is_active,
+            order: $product->order,
+            createdAt: $product->created_at,
+            updatedAt: $product->updated_at,
         );
     }
 
@@ -28,20 +29,19 @@ class ProductMapper
      */
     public static function toDomainArray(array $productModels): array
     {
-        return array_map(fn (array $productModel) => self::toDomain($productModel), $productModels);
+        return array_map(fn (ProductModel $productModel) => self::toDomain($productModel), $productModels);
     }
 
     /**
      * Maps raw data to the ProductModel for persistence.
      */
-    public static function toPersistence(array $data, ?array $productModel = null): array
+    public static function toPersistence(array $data, ?ProductModel $productModel = null): ProductModel
     {
-        $model = $productModel ?? [];
+        $model = $productModel ?? new ProductModel();
 
-        $model['name'] = $data['name'] ?? $model['name'];
-        $model['is_active'] = $data['isActive'] ?? $model['is_active'];
-        $model['order'] = $data['order'] ?? $model['order'];
-
+        $model->name = $data['name'] ?? $model->name;
+        $model->is_active = $data['isActive'] ?? $model->is_active;
+        $model->order = $data['order'] ?? $model->order;
         return $model;
     }
 }

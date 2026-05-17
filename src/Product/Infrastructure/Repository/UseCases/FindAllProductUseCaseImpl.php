@@ -13,8 +13,12 @@ class FindAllProductUseCaseImpl
      */
     public function execute(): array
     {
-        $productModels = ProductModel::all();
+        $productModels = ProductModel::orderBy('order')->paginate(10);
 
-        return ProductMapper::toDomainArray($productModels->toArray());
+        $items = ProductMapper::toDomainArray($productModels->items());
+
+        $productModels->setCollection(collect($items));
+
+        return $productModels->toArray();
     }
 }

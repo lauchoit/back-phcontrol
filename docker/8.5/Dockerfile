@@ -1,8 +1,8 @@
-FROM ubuntu:24.04
+FROM ubuntu:24.04 AS base-system
 
 LABEL maintainer="Taylor Otwell"
 
-ARG WWWGROUP
+ARG WWWGROUP=1000
 ARG NODE_VERSION=24
 ARG MYSQL_CLIENT="mysql-client"
 ARG POSTGRES_VERSION=18
@@ -24,7 +24,7 @@ RUN echo "Acquire::http::Pipeline-Depth 0;" > /etc/apt/apt.conf.d/99custom && \
 
 RUN apt-get update && apt-get upgrade -y \
     && mkdir -p /etc/apt/keyrings \
-    && apt-get install -y gnupg gosu curl ca-certificates zip unzip git supervisor sqlite3 libcap2-bin libpng-dev python3 dnsutils librsvg2-bin fswatch ffmpeg nano  \
+    && apt-get install -y gnupg gosu curl ca-certificates zip unzip git supervisor sqlite3 libcap2-bin libpng-dev python3 dnsutils librsvg2-bin fswatch ffmpeg nano \
     && curl -sS 'https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xb8dc7e53946656efbce4c1dd71daeaab4ad4cab6' | gpg --dearmor | tee /etc/apt/keyrings/ppa_ondrej_php.gpg > /dev/null \
     && echo "deb [signed-by=/etc/apt/keyrings/ppa_ondrej_php.gpg] https://ppa.launchpadcontent.net/ondrej/php/ubuntu noble main" > /etc/apt/sources.list.d/ppa_ondrej_php.list \
     && apt-get update \
@@ -82,11 +82,60 @@ RUN groupadd --force -g $WWWGROUP sail
 RUN useradd -ms /bin/bash --no-user-group -g $WWWGROUP -u 1337 sail
 RUN git config --global --add safe.directory /var/www/html
 
-COPY start-container /usr/local/bin/start-container
-COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
-COPY php.ini /etc/php/8.5/cli/conf.d/99-sail.ini
-COPY .bash_aliases /root/.bash_aliases
+COPY docker/8.5/start-container /usr/local/bin/start-container
+COPY docker/8.5/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY docker/8.5/php.ini /etc/php/8.5/cli/conf.d/99-sail.ini
+COPY docker/8.5/.bash_aliases /root/.bash_aliases
 RUN chmod +x /usr/local/bin/start-container
+
+FROM base-system AS dependencies
+
+COPY . .
+
+RUN composer install --no-interaction --prefer-dist --optimize-autoloader
+RUN npm ci --ignore-scripts
+RUN npm run build
+
+FROM dependencies AS tests
+
+RUN touch /tmp/testing.sqlite \
+    && APP_ENV=testing \
+        APP_KEY=base64:MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTI= \
+        DB_CONNECTION=sqlite \
+        DB_DATABASE=/tmp/testing.sqlite \
+        CACHE_STORE=array \
+        SESSION_DRIVER=array \
+        QUEUE_CONNECTION=sync \
+        php artisan config:clear --ansi \
+    && APP_ENV=testing \
+        APP_KEY=base64:MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTI= \
+        DB_CONNECTION=sqlite \
+        DB_DATABASE=/tmp/testing.sqlite \
+        CACHE_STORE=array \
+        SESSION_DRIVER=array \
+        QUEUE_CONNECTION=sync \
+        php artisan migrate --force --no-interaction \
+    && APP_ENV=testing \
+        APP_KEY=base64:MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTI= \
+        DB_CONNECTION=sqlite \
+        DB_DATABASE=/tmp/testing.sqlite \
+        CACHE_STORE=array \
+        SESSION_DRIVER=array \
+        QUEUE_CONNECTION=sync \
+        php artisan db:seed --class=Database\\Seeders\\TestSeeder --force --no-interaction \
+    && APP_ENV=testing \
+        APP_KEY=base64:MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTI= \
+        DB_CONNECTION=sqlite \
+        DB_DATABASE=/tmp/testing.sqlite \
+        CACHE_STORE=array \
+        SESSION_DRIVER=array \
+        QUEUE_CONNECTION=sync \
+        php artisan test --compact
+
+FROM tests AS runtime
+
+RUN mkdir -p storage/framework/cache storage/framework/sessions storage/framework/views storage/logs bootstrap/cache \
+    && chown -R sail:sail storage bootstrap/cache
 
 EXPOSE 80/tcp
 

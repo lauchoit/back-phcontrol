@@ -19,10 +19,10 @@ class UpdateByIdProductUseCaseImpl
             throw new ProductNotFoundException($productId);
         }
 
-        $productUpdated = ProductMapper::toPersistence($data, $productModel->toArray());
-        $productModel->fill($productUpdated);
-        $productModel->save();
+        $productUpdated = ProductMapper::toPersistence($data, $productModel);
+//        $productModel->fill($productUpdated);
+        $productUpdated->save();
 
-        return ProductMapper::toDomain($productModel->toArray());
+        return ProductMapper::toDomain($productModel);
     }
 }
